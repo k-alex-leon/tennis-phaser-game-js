@@ -46,22 +46,12 @@ let brickInfo = {
 let scoreTxt;
 let score = 0;
 
+// user lives
+let lives = 3;
+let livesTxt;
+let lifeLostText;
 
 function initBricks(ctx) {
-  // brickInfo = {
-  //   width: 50,
-  //   height: 50,
-  //   count: {
-  //     row: 3,
-  //     col: 7,
-  //   },
-  //   offset: {
-  //     top: 50,
-  //     left: 60,
-  //   },
-  //   padding: 10,
-  // };
-
   bricks = ctx.add.group();
 
   for (let c = 0; c < brickInfo.count.col; c++) {
@@ -146,6 +136,22 @@ function create() {
     font: "18px Arial",
     fill: "#0095DD",
   });
+
+  // USER LIVES TEXT
+  livesTxt = this.add.text(game.canvas.width - 100, 10, `Lives: ${lives}`, {
+    font: "18px Arial",
+    fill: "#0095DD",
+  });
+
+  lifeLostText = this.add.text(
+    game.canvas.width * 0.5,
+    game.canvas.height * 0.5,
+    "Life lost, click to continue",
+    { font: "18px Arial", fill: "#0095DD" },
+  );
+
+  lifeLostText.setOrigin(0.5)
+  lifeLostText.setVisible(false)
 
   console.log("I'm ready!");
 }
