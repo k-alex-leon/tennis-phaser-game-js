@@ -1,5 +1,5 @@
 import "./style.css";
-import Phaser, { Physics } from "phaser";
+import Phaser from "phaser";
 
 const config = {
   type: Phaser.AUTO,
@@ -26,10 +26,79 @@ const game = new Phaser.Game(config);
 
 let ball;
 let paddle;
+let bricks;
+let newBrick;
+let brickInfo = {
+  width: 50,
+  height: 50,
+  count: {
+    row: 3,
+    col: 7,
+  },
+  offset: {
+    top: 50,
+    left: 60,
+  },
+  padding: 10,
+};
+
+// score
+let scoreTxt;
+let score = 0;
+
+
+function initBricks(ctx) {
+  // brickInfo = {
+  //   width: 50,
+  //   height: 50,
+  //   count: {
+  //     row: 3,
+  //     col: 7,
+  //   },
+  //   offset: {
+  //     top: 50,
+  //     left: 60,
+  //   },
+  //   padding: 10,
+  // };
+
+  bricks = ctx.add.group();
+
+  for (let c = 0; c < brickInfo.count.col; c++) {
+    for (let r = 0; r < brickInfo.count.row; r++) {
+      // create new brick and adding to the group (bricks)
+      let brickX =
+        c * (brickInfo.width + brickInfo.padding) + brickInfo.offset.left;
+      let brickY =
+        r * (brickInfo.height + brickInfo.padding) + brickInfo.offset.top;
+
+      newBrick = ctx.physics.add.image(brickX, brickY, "brick");
+
+      // ctx.physics.add.collider(newBrick, ball)
+      newBrick.setImmovable(true);
+
+      bricks.add(newBrick);
+    }
+  }
+}
+
+function ballHitBrick(ball, brick) {
+  // brick.kill() // -> is not working for this version
+  brick.destroy();
+  score++;
+  scoreTxt.setText(`Score: ${score}`);
+
+  if (score >= brickInfo.count.col * brickInfo.count.row) {
+    console.log("YOU WIN");
+    game.destroy(true, false);
+  }
+}
+
 // takes care of preload the assets
 function preload() {
   this.load.image("ball", "/ball.png");
   this.load.image("paddle", "/paddle.png");
+  this.load.image("brick", "/brick.png");
 }
 // is executed once when everithing is loaded and ready
 function create() {
@@ -48,8 +117,6 @@ function create() {
   ball.setVelocity(150, -150);
 
   this.physics.add.collider(ball);
-
-  //  this.physics.arcade.checkCollision.down = false;
 
   // paddle config
   paddle = this.physics.add.image(
@@ -70,16 +137,28 @@ function create() {
   this.physics.world.checkCollision.down = false;
   // this.physics.world.setBoundsCollision(true, true, true, false)
 
+  // INIT BLOCKS
+  // bricks = this.add.group() // -> check later! 😅
+  initBricks(this);
+
+  // SCORE
+  scoreTxt = this.add.text(10, 10, "Score: 0", {
+    font: "18px Arial",
+    fill: "#0095DD",
+  });
+
   console.log("I'm ready!");
 }
+
 // is executed on everty frame
 function update() {
   this.physics.world.collide(ball, paddle);
+  this.physics.world.collide(ball, bricks, ballHitBrick);
   paddle.x = this.input.x;
 
   if (ball.y > game.canvas.height) {
     console.log("GAME OVER!");
-    game.destroy(true, false)
+    game.destroy(true, false);
     // game.scene.pause();
     // this.physics.pause();
     // game.destroy(true)
