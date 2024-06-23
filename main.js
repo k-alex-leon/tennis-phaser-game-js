@@ -9,8 +9,8 @@ const config = {
   physics: {
     default: "arcade",
     arcade: {
-      // debug: true,
-      debug: false,
+      debug: true,
+      // debug: false,
     },
   },
   scale: {
@@ -89,6 +89,10 @@ function ballHitBrick(ball, brick) {
   }
 }
 
+function ballHitPaddle(ball, paddle) {
+  ball.play("wobble");
+}
+
 function stopGame(message) {
   console.log(message);
   game.destroy(true, false);
@@ -96,18 +100,38 @@ function stopGame(message) {
 
 // takes care of preload the assets
 function preload() {
-  this.load.image("ball", "/ball.png");
+  // this.load.image("ball", "/ball.png");
   this.load.image("paddle", "/paddle.png");
   this.load.image("brick", "/brick.png");
+  this.load.spritesheet("ball", "/wobble.png", {
+    frameWidth: 20,
+    frameHeight: 20,
+  });
 }
 // is executed once when everithing is loaded and ready
 function create() {
   // ball config
-  ball = this.physics.add.image(
+
+  this.anims.create({
+    key: "wobble",
+    frames: this.anims.generateFrameNumbers("ball", { start: 1, end: 2 }),
+    frameRate: 10,
+    repeat: 1,
+  });
+
+  ball = this.physics.add.sprite(
     game.canvas.width * 0.5,
     game.canvas.height - 20,
     "ball"
   );
+
+  // ball = this.add.sprite(
+  //   game.canvas.width * 0.5,
+  //   game.canvas.height - 25,
+  //   "ball"
+  // );
+
+  // ball.animations.add("wooble", [0, 1, 0, 2, 0, 1, 0, 2, 0], 24);
   // set a radius
   ball.setCircle(10);
 
@@ -167,7 +191,7 @@ function create() {
 
 // is executed on everty frame
 function update() {
-  this.physics.world.collide(ball, paddle);
+  this.physics.world.collide(ball, paddle, ballHitPaddle);
   this.physics.world.collide(ball, bricks, ballHitBrick);
   paddle.x = this.input.x;
 
@@ -177,7 +201,7 @@ function update() {
 
     livesTxt.setText(`Lives: ${lives}`);
     // shake camera
-    this.cameras.main.shake(500)
+    this.cameras.main.shake(500);
 
     // this.cameras.main.on('camerashakestart', function (){
     //   lifeLostText.setVisible(true)
