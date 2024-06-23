@@ -9,7 +9,8 @@ const config = {
   physics: {
     default: "arcade",
     arcade: {
-      debug: true,
+      // debug: true,
+      debug: false,
     },
   },
   scale: {
@@ -42,6 +43,11 @@ let brickInfo = {
   padding: 10,
 };
 
+// text style
+let textStyle = {
+  font: "18px Arial",
+  fill: "#0095DD",
+};
 // score
 let scoreTxt;
 let score = 0;
@@ -79,9 +85,13 @@ function ballHitBrick(ball, brick) {
   scoreTxt.setText(`Score: ${score}`);
 
   if (score >= brickInfo.count.col * brickInfo.count.row) {
-    console.log("YOU WIN");
-    game.destroy(true, false);
+    stopGame("YOU WIN");
   }
+}
+
+function stopGame(message) {
+  console.log(message);
+  game.destroy(true, false);
 }
 
 // takes care of preload the assets
@@ -132,26 +142,25 @@ function create() {
   initBricks(this);
 
   // SCORE
-  scoreTxt = this.add.text(10, 10, "Score: 0", {
-    font: "18px Arial",
-    fill: "#0095DD",
-  });
+  scoreTxt = this.add.text(10, 10, "Score: 0", textStyle);
 
   // USER LIVES TEXT
-  livesTxt = this.add.text(game.canvas.width - 100, 10, `Lives: ${lives}`, {
-    font: "18px Arial",
-    fill: "#0095DD",
-  });
-
-  lifeLostText = this.add.text(
-    game.canvas.width * 0.5,
-    game.canvas.height * 0.5,
-    "Life lost, click to continue",
-    { font: "18px Arial", fill: "#0095DD" },
+  livesTxt = this.add.text(
+    game.canvas.width - 100,
+    10,
+    `Lives: ${lives}`,
+    textStyle
   );
 
-  lifeLostText.setOrigin(0.5)
-  lifeLostText.setVisible(false)
+  // lifeLostText = this.add.text(
+  //   game.canvas.width * 0.5,
+  //   game.canvas.height * 0.5,
+  //   "Life lost, click to continue",
+  //   textStyle
+  // );
+
+  // lifeLostText.setOrigin(0.5);
+  // lifeLostText.setVisible(false);
 
   console.log("I'm ready!");
 }
@@ -163,11 +172,29 @@ function update() {
   paddle.x = this.input.x;
 
   if (ball.y > game.canvas.height) {
-    console.log("GAME OVER!");
-    game.destroy(true, false);
-    // game.scene.pause();
-    // this.physics.pause();
-    // game.destroy(true)
-    // location.reload()
+    lives--;
+    if (!lives) stopGame("GAME OVER!");
+
+    livesTxt.setText(`Lives: ${lives}`);
+    // shake camera
+    this.cameras.main.shake(500)
+
+    // this.cameras.main.on('camerashakestart', function (){
+    //   lifeLostText.setVisible(true)
+    // })
+
+    // this.cameras.main.on('camerashakecomplete', function (){
+    //   lifeLostText.setVisible(false)
+    // })
+    // game.camera.main.shake(500)
+
+    // reset ball position
+    ball.x = game.canvas.width * 0.5;
+    ball.y = game.canvas.height - 20;
+    ball.setVelocity(150, -150);
+
+    // reset paddle position
+    paddle.x = game.canvas.width * 0.5;
+    paddle.y = game.canvas.height - 10;
   }
 }
