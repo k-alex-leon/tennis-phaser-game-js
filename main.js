@@ -55,7 +55,18 @@ let score = 0;
 // user lives
 let lives = 3;
 let livesTxt;
-let lifeLostText;
+// let lifeLostText;
+
+// start button
+let isPlaying;
+let startButton;
+
+function startGame() {
+  console.log("clicked!");
+  startButton.destroy();
+  ball.setVelocity(150, -150);
+  isPlaying = true;
+}
 
 function initBricks(ctx) {
   bricks = ctx.add.group();
@@ -107,6 +118,11 @@ function preload() {
     frameWidth: 20,
     frameHeight: 20,
   });
+
+  this.load.spritesheet("button", "/button.png", {
+    frameWidth: 120,
+    frameHeight: 40,
+  });
 }
 // is executed once when everithing is loaded and ready
 function create() {
@@ -138,7 +154,7 @@ function create() {
   ball.setCollideWorldBounds(true);
   ball.setBounce(1);
 
-  ball.setVelocity(150, -150);
+  // ball.setVelocity(150, -150);
 
   this.physics.add.collider(ball);
 
@@ -185,6 +201,35 @@ function create() {
 
   // lifeLostText.setOrigin(0.5);
   // lifeLostText.setVisible(false);
+
+  // START BUTTON CONFIG
+  // startButton = this.add.button(
+  //   game.canvas.width * 0.5,
+  //   game.canvas.height * 0.5,
+  //   'button',
+  //   startGame,
+  //   this,
+  //   1,0,2
+  // )
+
+  this.anims.create({
+    key: "btn",
+    frames: this.anims.generateFrameNumbers("button", { start: 0, end: 2 }),
+    frameRate: 2,
+    repeat: -1,
+  });
+
+  startButton = this.add.sprite(
+    game.canvas.width * 0.5,
+    game.canvas.height * 0.5,
+    "button"
+  );
+
+  startButton.setInteractive({ pixelPerfect: true });
+  startButton.setOrigin(0.5);
+  startButton.play("btn");
+
+  startButton.on("pointerdown", startGame);
 
   console.log("I'm ready!");
 }
