@@ -9,8 +9,8 @@ const config = {
   physics: {
     default: "arcade",
     arcade: {
-      debug: true,
-      // debug: false,
+      // debug: true,
+      debug: false,
     },
   },
   scale: {
@@ -34,7 +34,7 @@ let brickInfo = {
   height: 50,
   count: {
     row: 3,
-    col: 7,
+    col: 12,
   },
   offset: {
     top: 50,
@@ -102,6 +102,8 @@ function ballHitBrick(ball, brick) {
 
 function ballHitPaddle(ball, paddle) {
   ball.play("wobble");
+  // ball.setVelocity(-150, -randomBounce)
+  ball.body.velocity.x = -5 * (paddle.x - ball.x)
 }
 
 function stopGame(message) {
@@ -238,7 +240,7 @@ function create() {
 function update() {
   this.physics.world.collide(ball, paddle, ballHitPaddle);
   this.physics.world.collide(ball, bricks, ballHitBrick);
-  paddle.x = this.input.x;
+  if(isPlaying) paddle.x = this.input.x;
 
   if (ball.y > game.canvas.height) {
     lives--;
